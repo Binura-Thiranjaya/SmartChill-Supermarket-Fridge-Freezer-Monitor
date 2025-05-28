@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SmartChill Monitor</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f7f9fc;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #198754;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      border: none;
+      border-radius: 12px;
+      transition: transform 0.2s ease-in-out;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .card:hover {
+      transform: scale(1.02);
+    }
+
+    .value {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .safe {
+      color: #0d6efd;
+    }
+
+    .alerting {
+      background-color: #ffe0e0;
+      color: #dc3545;
+      animation: blink 1s infinite;
+    }
+
+    .message {
+      font-size: 0.9rem;
+      text-align: center;
+      color: #dc3545;
+      margin-top: -10px;
+    }
+
+    #lastUpdated {
+      font-size: 1rem;
+      color: #6c757d;
+    }
+
+    @keyframes blink {
+      0%, 100% { background-color: #ffe0e0; }
+      50%      { background-color: #ffc4c4; }
+    }
+
+    .animate-fade {
+      animation: fadeIn 0.6s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      0%   { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+
+  <script>
+    const AUTH = '8AkVwxIz4ze6f1bl03qCJ31rbci_FCiY';
+
+    async function fetchVal(pin) {
+      const res = await fetch(`https://blynk.cloud/external/api/get?token=${AUTH}&${pin}`);
+      return (await res.text()).trim();
+    }
+
+    function setAlert(elementId, cardId, value, min, max) {
+      const valueEl = document.getElementById(elementId);
+      const cardEl = document.getElementById(cardId);
+      const messageEl = document.getElementById(cardId + "-msg");
+
+      const numeric = parseFloat(value);
+      valueEl.innerText = value + " °C";
+
+      if (numeric < min || numeric > max) {
+        cardEl.classList.add("alerting");
+        messageEl.innerText = `⚠️ Alert: Temperature out of safe range!`;
+      } else {
+        cardEl.classList.remove("alerting");
+        messageEl.innerText = "";
+        valueEl.classList.add("safe");
+      }
+    }
+
+    async function update() {
+      try {
+        const v0 = await fetchVal('V0'); // Fridge
+        const v1 = await fetchVal('V1'); // Freezer
+        const v2 = await fetchVal('V2'); // Leak
+
+        setAlert('t1', 'card1', v0, 0, 5);
+        setAlert('t2', 'card2', v1, -50, -18);
+
+        document.getElementById('leak').innerText = v2;
+
+        const now = new Date();
+        document.getElementById('lastUpdated').innerText = "Last updated: " + now.toLocaleString();
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      }
+    }
+
+    setInterval(update, 2000);
+    window.onload = update;
+  </script>
+</head>
+
+<body>
+  <h1>SmartChill Monitor</h1>
+
+  <div class="container">
+    <div class="row gy-4">
+
+      <div class="col-md-4 animate-fade">
+        <div class="card p-4" id="card1">
+          <h5 class="card-title text-center">Fridge Temperature</h5>
+          <p class="text-center value" id="t1">–</p>
+          <p class="message" id="card1-msg"></p>
+        </div>
+      </div>
+
+      <div class="col-md-4 animate-fade">
+        <div class="card p-4" id="card2">
+          <h5 class="card-title text-center">Freezer Temperature</h5>
+          <p class="text-center value" id="t2">–</p>
+          <p class="message" id="card2-msg"></p>
+        </div>
+      </div>
+
+      <div class="col-md-4 animate-fade">
+        <div class="card p-4">
+          <h5 class="card-title text-center">Leak Detection</h5>
+          <p class="text-center value" id="leak">–</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="row mt-4">
+      <div class="col text-center">
+        <p id="lastUpdated">Last updated: –</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+</body>
+</html>
