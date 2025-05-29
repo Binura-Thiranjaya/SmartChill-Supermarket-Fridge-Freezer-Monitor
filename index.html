@@ -100,8 +100,8 @@
       }
     }
 
-    async function update() {
-      try {
+   async function update() {
+    try {
         const v0 = await fetchVal('V0'); // Fridge
         const v1 = await fetchVal('V1'); // Freezer
         const v2 = await fetchVal('V2'); // Leak
@@ -109,14 +109,28 @@
         setAlert('t1', 'card1', v0, 0, 5);
         setAlert('t2', 'card2', v1, -50, -18);
 
-        document.getElementById('leak').innerText = v2;
+        const leakEl = document.getElementById('leak');
+        const leakCard = document.getElementById('card3');
+        const leakMsg = document.getElementById('card3-msg');
+        console.log("Leak status:", v2);
+        if (v2 === "Leak Detected") {
+        leakEl.innerText = "Leak Detected!";
+        leakEl.classList.remove("safe");
+        leakCard.classList.add("alerting");
+        leakMsg.innerText = "⚠️ Leak detected! Please check the unit.";
+        } else {
+        leakEl.innerText = "No Leak";
+        leakEl.classList.add("safe");
+        leakCard.classList.remove("alerting");
+        leakMsg.innerText = "";
+        }
 
         const now = new Date();
         document.getElementById('lastUpdated').innerText = "Last updated: " + now.toLocaleString();
-      } catch (err) {
+    } catch (err) {
         console.error("Error fetching data:", err);
-      }
     }
+}
 
     setInterval(update, 2000);
     window.onload = update;
@@ -145,12 +159,13 @@
         </div>
       </div>
 
-      <div class="col-md-4 animate-fade">
-        <div class="card p-4">
-          <h5 class="card-title text-center">Leak Detection</h5>
-          <p class="text-center value" id="leak">–</p>
+   <div class="col-md-4 animate-fade">
+        <div class="card p-4" id="card3">
+            <h5 class="card-title text-center">Leak Detection</h5>
+            <p class="text-center value" id="leak">–</p>
+            <p class="message" id="card3-msg"></p>
         </div>
-      </div>
+    </div>
 
     </div>
 
