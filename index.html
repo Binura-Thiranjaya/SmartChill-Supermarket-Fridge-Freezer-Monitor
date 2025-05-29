@@ -75,8 +75,7 @@
   </style>
 
   <script>
-    const AUTH = '8AkVwxIz4ze6f1bl03qCJ31rbci_FCiY';
-    //console.log("Auth Token:", getSecretKey());
+    const AUTH = 'YOUR_BLYNK_AUTH_TOKEN';
     async function fetchVal(pin) {
       const res = await fetch(`https://blynk.cloud/external/api/get?token=${AUTH}&${pin}`);
       return (await res.text()).trim();
@@ -112,7 +111,7 @@
         const leakEl = document.getElementById('leak');
         const leakCard = document.getElementById('card3');
         const leakMsg = document.getElementById('card3-msg');
-        //console.log("Leak status:", v2);
+        console.log("Leak status:", v2);
         if (v2 === "Leak Detected") {
         leakEl.innerText = "Leak Detected!";
         leakEl.classList.remove("safe");
@@ -179,7 +178,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-  <script src="env.js"></script>
 
 </body>
 </html>
