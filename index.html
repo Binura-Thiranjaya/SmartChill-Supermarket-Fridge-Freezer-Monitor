@@ -75,7 +75,8 @@
   </style>
 
   <script>
-    const AUTH = 'YOUR_BLYNK_AUTH_TOKEN';
+    const AUTH = '8AkVwxIz4ze6f1bl03qCJ31rbci_FCiY';
+    
     async function fetchVal(pin) {
       const res = await fetch(`https://blynk.cloud/external/api/get?token=${AUTH}&${pin}`);
       return (await res.text()).trim();
